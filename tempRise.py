@@ -26,7 +26,8 @@ class dataGroup():
         dict_samplerate = {}
         for i in range(len(self.input_df)): #read line by line of input_df
             
-            filename = self.prefix + self.input_df.iloc[i , 0]
+            #filename = self.prefix + self.input_df.iloc[i , 0]
+            filename = self.prefix + self.input_df['filename'][i]  #col 1 holds the names of the datafile .csv from the data logger
             temp_df = pd.read_csv(filename,low_memory = False) 
             filter = temp_df.iloc[ : , 0] == 'Scan Sweep Time (Sec)'
             index = list(filter).index(True) + 1
@@ -37,15 +38,15 @@ class dataGroup():
             temp_df = pd.read_csv(filename, skiprows = index)
             temp_df = temp_df.dropna(axis = 1, how = 'all')
             temp_df = temp_df.dropna(axis = 0)
-            file = self.input_df.iloc[i, 0]
+            file = self.input_df['filename'][i]
             if file not in dict_df.keys():
                 dict_df[file] = temp_df.iloc[ :, 0:2]
                 dict_samplerate[file] = samplerate
-            col_x = self.input_df.iloc[i, 4]  #col_id is column 4 in input_df
+            col_x = self.input_df['col_id'][i]  #col_id is column 4 in input_df
             dict_df[file] = dict_df[file].join(temp_df.iloc[ : , col_x])    
             
             cols = list(dict_df[file].columns)
-            cols[-1] = '#' + str(self.input_df.iloc[i, 1]) + ' ' + self.input_df.iloc[i, 3] + ' ' + self.input_df.iloc[i,5]
+            cols[-1] = '#' + str(self.input_df['cable_id'][i]) + ' ' + self.input_df['test_type'][i] + ' ' + self.input_df['label'][i]
             dict_df[file].columns = cols
  
             #print(dict_df[filename].columns) #[self.input_df[j,4]] = self.input_df[j, 5]  #label is column 5 in input_df
