@@ -9,9 +9,21 @@ def main(input_csv_file, data_path, index_list):
     
     input_df = pd.read_csv(input_csv_file)
     if index_list != None:
-        input_df = input_df.iloc[index_list, : ]
+        #input_df = input_df.iloc[index_list, : ]
+        iloc_idx_list = []
+        idx_col = list(input_df['index'])
+        for idx in index_list:  
+            try:
+                row_num = idx_col.index(idx)
+                iloc_idx_list.append(row_num)
+            except ValueError:
+                continue    
+        input_df = input_df.iloc[iloc_idx_list, : ]
+        input_df = input_df.reset_index(drop=True)        
+        print('input_df: \n', input_df, '\n')    
     newclass = tempRise.dataGroup(input_df, data_path)
     new_dict_df = newclass.dict_df
+    newclass.make_temprise_table()
 
     while True:
         print('\n')
@@ -70,7 +82,7 @@ if __name__ == '__main__':
     if index_str == 'None':
         index_list = None
     else:
-        index_str = index_str[1:]
+        index_str = index_str[1:]  #convert string to list of integers  ... make into a function?
         index_list = []
         temp_str = ''
         for ch in index_str:

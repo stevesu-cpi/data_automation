@@ -10,8 +10,8 @@ class dataGroup():
 
     def __init__(self, input_df, prefix) -> None:
         
-        self.start_index = 2  #!!! this must always be col 2 in the dataframe
-        self.input_df = input_df
+        self.start_index = 2  #!!! this must always be col 2 in the dataframe (the col which real data starts)
+        self.input_df = input_df  #this is the filetracker.csv file
         self.prefix = prefix  #path to the actual data files 
         self.file_set = set(list(input_df.iloc[ :, 0]))
         self.dict_df, self.dict_samplerate = self.make_dict_df()  #!!! sample rate must be in same location
@@ -19,14 +19,13 @@ class dataGroup():
         self.hr_conversion = 1/3600
         self.min_conversion = 1/60
         self.temp_list = [20,30,40,50]  #temps to evaluate derate time
+        self.at_time_temprise = 2 #time in hours at temprise reading
         pass
 
     def make_dict_df(self):
         dict_df = {}
         dict_samplerate = {}
         for i in range(len(self.input_df)): #read line by line of input_df
-            
-            #filename = self.prefix + self.input_df.iloc[i , 0]
             filename = self.prefix + self.input_df['filename'][i]  #col 1 holds the names of the datafile .csv from the data logger
             temp_df = pd.read_csv(filename,low_memory = False) 
             filter = temp_df.iloc[ : , 0] == 'Scan Sweep Time (Sec)'
@@ -89,6 +88,17 @@ class dataGroup():
                         derate_dct[i][j][label] = [time]
                                
         return derate_dct
+            
+            
+    def make_temprise_table(self):
+        #print('Temp rise deg C:\n')
+        delta_dct = self.calculate_delta()
+        for i in list(self.dict_df.keys()):
+            hrs = delta_dct[i].iloc[ : , 1] * self.hr_conversion
+            indx = len(list(hrs[hrs < self.at_time_temprise]))
+            print('Temp rise deg C at ', indx * self.hr_conversion, ' hrs')
+            print(delta_dct[i].iloc[indx-1, 2: ], '\n')
+        return
     
     def make_derate_table(self):
         derate_dct = self.calculate_derate_time()
