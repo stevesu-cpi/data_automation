@@ -11,11 +11,11 @@ def main(input_csv_file, data_path):
     print('\n')
     inp = input('Choose filter type: r = row, c = cable, n = none, e = exit or any other key: ')        
     if inp == 'r':
-        inp_list = input('enter row numbers i.e. [1,3,4,6]: ')
+        inp_list = input('enter row numbers i.e. [1,3,4,6] or [1-4]: ')
         inp_list = convert_to_intlist(inp_list)
         idx_col = list(input_df['index'])
     elif inp == 'c':
-        inp_list = input('enter cable ids i.e. [1,3,4,6]: ')
+        inp_list = input('enter cable ids i.e. [1,3,4,6] or [1-4]: ')
         inp_list = convert_to_intlist(inp_list)
         idx_col = list(input_df['cable_id'])
     elif inp == 'n':
